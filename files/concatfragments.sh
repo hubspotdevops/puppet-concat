@@ -107,7 +107,7 @@ fi
 
 cd ${WORKDIR}
 
-if [ x${WARNMSG} = "x" ]; then
+if [ "x${WARNMSG}" = "x" ]; then
 	: > "fragments.concat"
 else
 	printf '%s\n' "$WARNMSG" > "fragments.concat"
@@ -118,9 +118,14 @@ if [ x${ENSURE_NEWLINE} != x ]; then
 fi
 
 # find all the files in the fragments directory, sort them numerically and concat to fragments.concat in the working dir
-find fragments/ -type f -follow | sort ${SORTARG} | while read fragfile; do
-	cat "$fragfile" >> "fragments.concat"
+IFS_BACKUP=$IFS
+IFS='
+'
+for fragfile in `find fragments/ -type f -follow | LANG=C sort ${SORTARG}`
+do
+    cat $fragfile >> concat.fragment
 done
+IFS=$IFS_BACKUP
 
 if [ x${TEST} = "x" ]; then
 	# This is a real run, copy the file to outfile
